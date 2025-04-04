@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff, Volume2, Award, ChevronRight, Repeat, Check, Lock, ArrowLeft, BookOpen, Zap } from "lucide-react";
+import { Send, Bot, User, Sparkles, Loader2, Mic, MicOff, Volume2, Award, ChevronRight, Repeat, Check, Lock, ArrowLeft, BookOpen, Zap, VolumeX } from "lucide-react";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { GoogleGenAI } from "@google/genai";
@@ -434,6 +434,15 @@ const ShabdGPT: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      // Chrome needs this to load voices
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
+
   const startLevel = (level: LearningLevel) => {
     if (!level.isUnlocked) {
       simulateAIResponse("You need to complete the previous level first!");
@@ -670,6 +679,28 @@ const ShabdGPT: React.FC = () => {
                                 </button>
                               </div>
                             )}
+                            
+                            {/* Add speak button for bot messages */}
+                            {!message.isUser && (
+                              <div className="mt-2 flex gap-2">
+                                <button
+                                  onClick={() => speakText(message.text)}
+                                  className="flex items-center gap-1 text-xs bg-hindi-purple/10 px-2.5 py-1.5 rounded-full hover:bg-hindi-purple/20 transition-colors text-hindi-purple"
+                                  title="Listen to this message"
+                                >
+                                  <Volume2 className="h-3 w-3" />
+                                  <span>Speak</span>
+                                </button>
+                                <button
+                                  onClick={() => window.speechSynthesis.cancel()}
+                                  className="flex items-center gap-1 text-xs bg-gray-100 px-2.5 py-1.5 rounded-full hover:bg-gray-200 transition-colors text-gray-500"
+                                  title="Stop speaking"
+                                >
+                                  <VolumeX className="h-3 w-3" />
+                                  <span>Stop</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -794,3 +825,39 @@ const ShabdGPT: React.FC = () => {
 };
 
 export default ShabdGPT;
+
+
+// Function to speak text using Web Speech API
+const speakText = (text: string) => {
+  if ('speechSynthesis' in window) {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Create a new speech synthesis utterance
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Detect if text contains Hindi characters
+    const containsHindi = /[\u0900-\u097F]/.test(text);
+    
+    // Set language based on content
+    utterance.lang = containsHindi ? 'hi-IN' : 'en-US';
+    
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to find a Hindi voice if text contains Hindi
+    if (containsHindi) {
+      const hindiVoice = voices.find(voice => 
+        voice.lang.includes('hi') || voice.name.includes('Hindi')
+      );
+      if (hindiVoice) utterance.voice = hindiVoice;
+    }
+    
+    // Speak the text
+    window.speechSynthesis.speak(utterance);
+  } else {
+    console.error("Speech synthesis not supported in this browser");
+  }
+};
+
+// Load voices when the component mounts
