@@ -29,5 +29,5 @@ ShabdGPT is a voice-enabled web application designed to help you learn Hindi eas
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/shabdgpt.git
+   git clone https://github.com/Piyush0049/ShabdGPT.git
    cd shabdgpt
