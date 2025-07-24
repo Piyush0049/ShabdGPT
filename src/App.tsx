@@ -13,19 +13,15 @@ const App: React.FC = () => {
           <title>ShabdBhaasha - Learn Hindi Language</title>
           <meta name="description" content="Learn Hindi language with interactive tools and AI assistance" />
         </Helmet>
-        
-        {/* <Navbar /> */}
-        
+
+
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/about" element={<About />} /> */}
             <Route path="/shabdgpt" element={<ShabdGPT />} />
-            {/* Add other routes as needed */}
           </Routes>
         </main>
-        
-        {/* <Footer /> */}
+
       </div>
     </Router>
   );
