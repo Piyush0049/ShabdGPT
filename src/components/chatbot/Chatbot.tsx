@@ -28,7 +28,6 @@ interface Challenge {
   pronunciation?: string;
 }
 
-// Fallback responses if API fails
 const fallbackResponses = [
   "नमस्ते! कैसे हो आप? (Hello! How are you?)",
   "शब्दशिक्षा में आपका स्वागत है! (Welcome to ShabdShiksha!)",
@@ -39,7 +38,6 @@ const fallbackResponses = [
   "Hindi is the 4th most spoken language in the world."
 ];
 
-// Learning levels data
 const learningLevels: LearningLevel[] = [
   {
     id: 1,
@@ -123,7 +121,6 @@ const Chatbot: React.FC = () => {
     }
   }, [isOpen]);
 
-  // Initialize media recorder
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -139,8 +136,6 @@ const Chatbot: React.FC = () => {
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
         
-        // In a real app, you would send this audio to a speech recognition API
-        // For now, we'll simulate a successful recognition
         if (gameMode && currentLevel) {
           const challenge = currentLevel.challenges[currentChallengeIndex];
           handleGameResponse(challenge);
