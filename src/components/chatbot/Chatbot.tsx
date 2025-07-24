@@ -140,7 +140,6 @@ const Chatbot: React.FC = () => {
           const challenge = currentLevel.challenges[currentChallengeIndex];
           handleGameResponse(challenge);
         } else {
-          // Regular chat mode
           const userMessage: Message = {
             text: "🎤 Voice message",
             isUser: true,
@@ -150,7 +149,6 @@ const Chatbot: React.FC = () => {
           
           setMessages(prev => [...prev, userMessage]);
           
-          // Simulate AI response to voice
           simulateAIResponse("I heard your voice message! In a real app, I would transcribe and respond to what you said.");
         }
       };
