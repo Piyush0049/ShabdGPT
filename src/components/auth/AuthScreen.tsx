@@ -13,7 +13,6 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, appName = "Hindi
   
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      {/* Decorative element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-hindi-purple opacity-10 rounded-bl-full"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-hindi-magenta opacity-10 rounded-tr-full"></div>
       

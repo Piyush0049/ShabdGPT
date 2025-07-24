@@ -1,11 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Helmet } from "react-helmet";
-// import Navbar from "./components/Navbar";
-// import Footer from "./components/Footer";
 import Home from "./pages/Home";
-// import About from "./pages/About";
-// import Courses from "./pages/Courses";
 import ShabdGPT from "./pages/ShabdGPT";
 import "./index.css";
 
