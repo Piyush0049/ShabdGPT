@@ -211,7 +211,6 @@ const Chatbot: React.FC = () => {
   };
 
   const simulateAIResponse = (text: string) => {
-    // Add loading message
     const loadingMessage: Message = {
       text: "...",
       isUser: false,
@@ -221,8 +220,6 @@ const Chatbot: React.FC = () => {
     
     setMessages(prev => [...prev, loadingMessage]);
     setIsTyping(true);
-    
-    // Simulate delay for typing
     setTimeout(() => {
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
