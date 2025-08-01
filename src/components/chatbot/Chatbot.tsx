@@ -244,15 +244,12 @@ const Chatbot: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInput("");
-    
-    // Check for game commands
     if (input.toLowerCase().includes("practice") || input.toLowerCase().includes("level") || input.toLowerCase().includes("learn")) {
       setShowLevels(true);
       simulateAIResponse("Great! Here are our learning levels. Choose one to start practicing your Hindi skills.");
       return;
     }
     
-    // Add loading message
     const loadingMessage: Message = {
       text: "...",
       isUser: false,
@@ -266,7 +263,6 @@ const Chatbot: React.FC = () => {
     try {
       const aiResponse = await fetchAIResponse(input);
       
-      // Remove loading message and add actual response
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
