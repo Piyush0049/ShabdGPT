@@ -167,7 +167,6 @@ const Chatbot: React.FC = () => {
       mediaRecorder.stop();
       setIsRecording(false);
       
-      // Stop all audio tracks
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
   };
