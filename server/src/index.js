@@ -4,10 +4,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config();
 
-// Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 
