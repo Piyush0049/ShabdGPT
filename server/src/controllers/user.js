@@ -52,7 +52,6 @@ exports.updateProgress = async (req, res, next) => {
       user.progress.points += req.body.points;
     }
 
-    // Update streak logic
     const now = new Date();
     const lastActive = user.progress.lastActive || new Date(0);
     
