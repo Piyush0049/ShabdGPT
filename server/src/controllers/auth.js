@@ -95,7 +95,6 @@ exports.logout = async (req, res, next) => {
   });
 };
 
-// Helper function to get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
