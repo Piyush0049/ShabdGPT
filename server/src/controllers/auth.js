@@ -96,7 +96,6 @@ exports.logout = async (req, res, next) => {
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
   const token = user.getSignedJwtToken();
 
   const userData = {
