@@ -60,7 +60,6 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    // Update last active
     user.progress.lastActive = new Date();
     await user.save({ validateBeforeSave: false });
 
