@@ -42,7 +42,6 @@ exports.updateProgress = async (req, res, next) => {
       });
     }
 
-    // Update progress fields
     if (req.body.completedLesson) {
       if (!user.progress.completedLessons.includes(req.body.completedLesson)) {
         user.progress.completedLessons.push(req.body.completedLesson);
