@@ -55,7 +55,6 @@ exports.updateProgress = async (req, res, next) => {
     const now = new Date();
     const lastActive = user.progress.lastActive || new Date(0);
     
-    // Check if last active was yesterday or today
     const lastActiveDate = new Date(lastActive).setHours(0, 0, 0, 0);
     const today = new Date(now).setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
