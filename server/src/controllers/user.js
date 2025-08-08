@@ -65,7 +65,6 @@ exports.updateProgress = async (req, res, next) => {
     } else if (lastActiveDate < yesterday.getTime()) {
       user.progress.streak = 1;
     }
-    // If last active was today, don't change streak
 
     user.progress.lastActive = now;
     
