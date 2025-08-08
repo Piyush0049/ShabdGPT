@@ -68,7 +68,6 @@ exports.updateProgress = async (req, res, next) => {
 
     user.progress.lastActive = now;
     
-    // Update Hindi level based on points
     if (user.progress.points >= 1000 && user.hindiLevel === 'beginner') {
       user.hindiLevel = 'intermediate';
     } else if (user.progress.points >= 3000 && user.hindiLevel === 'intermediate') {
