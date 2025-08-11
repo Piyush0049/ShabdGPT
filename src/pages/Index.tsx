@@ -14,7 +14,7 @@ const Index = () => {
     <div className="min-h-screen">
       <AuthScreen 
         onAuthSuccess={handleAuthSuccess} 
-        appName="ShabdShiksha" 
+        appName="ShabdGPT" 
       />
     </div>
   );

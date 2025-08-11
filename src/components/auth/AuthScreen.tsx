@@ -27,7 +27,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess, appName = "Hindi
           <div className="text-center md:text-left">
             <h1 className="text-4xl md:text-6xl font-extrabold mb-4 text-hindi-dark">
               <span className="text-hindi-magenta">
-                {showLogin ? "शब्दशिक्षा" : "ShabdShiksha"}
+                {showLogin ? "शब्दशिक्षा" : "ShabdGPT"}
               </span>
             </h1>
             <p className="text-xl text-gray-700 mb-8 leading-relaxed font-medium">

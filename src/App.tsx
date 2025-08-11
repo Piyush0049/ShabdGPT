@@ -10,7 +10,7 @@ const App: React.FC = () => {
     <Router>
       <div className="flex flex-col min-h-screen">
         <Helmet>
-          <title>ShabdBhaasha - Learn Hindi Language</title>
+          <title>ShabdGPT - Learn Hindi Language</title>
           <meta name="description" content="Learn Hindi language with interactive tools and AI assistance" />
         </Helmet>
 

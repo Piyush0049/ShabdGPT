@@ -38,8 +38,8 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-hindi-purple/5 via-white to-hindi-magenta/5 overflow-hidden">
       <Helmet>
-        <title>ShabdShiksha - Learn Hindi with AI</title>
-        <meta name="description" content="ShabdShiksha is an AI-powered platform for learning Hindi through interactive conversations and challenges" />
+        <title>ShabdGPT - Learn Hindi with AI</title>
+        <meta name="description" content="ShabdGPT is an AI-powered platform for learning Hindi through interactive conversations and challenges" />
       </Helmet>
 
       {/* Floating elements */}
@@ -112,7 +112,7 @@ const Home: React.FC = () => {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-10 md:pt-20">
+      <section className="relative overflow-hidden">
         <div className="container mx-auto px-6 md:px-12 py-16 md:py-24">
           <div className="flex flex-col md:flex-row items-center justify-between gap-12">
             <motion.div 
@@ -170,36 +170,6 @@ const Home: React.FC = () => {
                     <ChevronRight className="h-5 w-5" />
                   </Link>
                 </motion.div>
-              </motion.div>
-              
-              {/* Stats */}
-              <motion.div 
-                className="flex gap-8 mt-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-hindi-purple" />
-                    <span className="text-2xl font-bold text-gray-800">10K+</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Active Learners</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-hindi-purple" />
-                    <span className="text-2xl font-bold text-gray-800">4.9</span>
-                  </div>
-                  <p className="text-sm text-gray-500">User Rating</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-hindi-purple" />
-                    <span className="text-2xl font-bold text-gray-800">120+</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Countries</p>
-                </div>
               </motion.div>
             </motion.div>
             
@@ -512,7 +482,7 @@ const Home: React.FC = () => {
             </div>
             <div className="text-gray-500 text-sm flex items-center gap-1">
               <Heart className="h-4 w-4 text-hindi-magenta" />
-              <span>© {new Date().getFullYear()} ShabdShiksha. All rights reserved.</span>
+              <span>© {new Date().getFullYear()} ShabdGPT. All rights reserved.</span>
             </div>
           </div>
         </div>

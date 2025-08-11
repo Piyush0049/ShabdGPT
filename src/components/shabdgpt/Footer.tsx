@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
     >
       <div className="flex items-center justify-center gap-1.5">
         <Sparkles className="h-3.5 w-3.5 text-hindi-purple" />
-        <span>Powered by Gemini AI • Learn Hindi with ShabdShiksha</span>
+        <span>Powered by Gemini AI • Learn Hindi with ShabdGPT</span>
       </div>
     </motion.div>
   );

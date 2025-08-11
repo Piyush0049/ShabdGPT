@@ -333,7 +333,7 @@ const ShabdGPT: React.FC = () => {
   
   const fallbackResponses = [
     "नमस्ते! कैसे हो आप? (Hello! How are you?)",
-    "शब्दशिक्षा में आपका स्वागत है! (Welcome to ShabdShiksha!)",
+    "शब्दशिक्षा में आपका स्वागत है! (Welcome to ShabdGPT!)",
     "Hindi uses the Devanagari script.",
     "मैं आपकी मदद कर सकता हूँ। (I can help you.)",
     "Try practicing one phrase every day!"
@@ -816,7 +816,7 @@ const ShabdGPT: React.FC = () => {
         >
           <div className="flex items-center justify-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-hindi-purple" />
-            <span>Powered by Gemini AI • Learn Hindi with ShabdShiksha</span>
+            <span>Powered by Gemini AI • Learn Hindi with ShabdGPT</span>
           </div>
         </motion.div>
       </div>
