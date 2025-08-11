@@ -430,31 +430,7 @@ const Home: React.FC = () => {
             </motion.div>
             
             {/* Testimonial */}
-            <motion.div 
-              className="mt-16 bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-hindi-purple to-hindi-magenta flex items-center justify-center text-white font-bold text-lg">
-                  A
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-800">Anika Sharma</h4>
-                  <p className="text-gray-500 text-sm">Hindi Learner from USA</p>
-                </div>
-                <div className="ml-auto flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-600 italic">
-                "ShabdGPT has transformed my Hindi learning experience. The voice recognition feature helps me perfect my pronunciation, and the AI provides personalized feedback that keeps me motivated. Highly recommended!"
-              </p>
-            </motion.div>
+            
           </motion.div>
         </div>
       </section>
