@@ -17,7 +17,7 @@ const ShabdGPTSummary: React.FC = () => {
             <div className="bg-white/20 p-2 rounded-full">
               <Bot className="h-6 w-6" />
             </div>
-            <h3 className="font-semibold text-xl">शब्द GPT</h3>
+            <h3 className="font-semibold text-xl">शब्दGPT</h3>
           </div>
           <div className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm">
             <Sparkles className="h-4 w-4" />

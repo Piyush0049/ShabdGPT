@@ -94,7 +94,7 @@ const Home: React.FC = () => {
             <BookOpen className="h-5 w-5 text-white" />
           </div>
           <h2 className="text-xl font-bold bg-gradient-to-r from-hindi-purple to-hindi-magenta text-transparent bg-clip-text">
-            शब्द शिक्षा
+            शब्दGPT
           </h2>
         </div>
         <motion.div
@@ -135,7 +135,7 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                शब्द GPT
+                शब्दGPT
               </motion.h1>
               <motion.p 
                 className="text-3xl font-light text-gray-700 mb-4"
@@ -422,14 +422,13 @@ const Home: React.FC = () => {
             >
               <Link 
                 to="/shabdgpt"
-                className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all text-lg"
+                className="inline-flex items-center gap-2 px-7 py-3 md:px-10 md:py-5 bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all text-lg"
               >
                 <span>Try ShabdGPT Now</span>
                 <ChevronRight className="h-5 w-5" />
               </Link>
             </motion.div>
             
-            {/* Testimonial */}
             
           </motion.div>
         </div>
@@ -445,17 +444,17 @@ const Home: React.FC = () => {
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-hindi-purple to-hindi-magenta text-transparent bg-clip-text">
-                  शब्द शिक्षा
+                  शब्दGPT
                 </h2>
               </div>
               <p className="text-gray-600 text-sm">Learn Hindi with AI - Powered by Gemini</p>
             </div>
-            <div className="flex gap-8 mb-8 md:mb-0">
+            {/* <div className="flex gap-8 mb-8 md:mb-0">
               <Link to="#" className="text-gray-600 hover:text-hindi-purple transition-colors">About</Link>
               <Link to="#" className="text-gray-600 hover:text-hindi-purple transition-colors">Features</Link>
               <Link to="#" className="text-gray-600 hover:text-hindi-purple transition-colors">Pricing</Link>
               <Link to="#" className="text-gray-600 hover:text-hindi-purple transition-colors">Contact</Link>
-            </div>
+            </div> */}
             <div className="text-gray-500 text-sm flex items-center gap-1">
               <Heart className="h-4 w-4 text-hindi-magenta" />
               <span>© {new Date().getFullYear()} ShabdGPT. All rights reserved.</span>

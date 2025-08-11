@@ -333,7 +333,7 @@ const ShabdGPT: React.FC = () => {
   
   const fallbackResponses = [
     "नमस्ते! कैसे हो आप? (Hello! How are you?)",
-    "शब्दशिक्षा में आपका स्वागत है! (Welcome to ShabdGPT!)",
+    "शब्दGPT में आपका स्वागत है! (Welcome to ShabdGPT!)",
     "Hindi uses the Devanagari script.",
     "मैं आपकी मदद कर सकता हूँ। (I can help you.)",
     "Try practicing one phrase every day!"
@@ -485,7 +485,7 @@ const ShabdGPT: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            शब्द GPT
+            शब्दGPT
           </motion.h1>
         </div>
         
