@@ -37,14 +37,22 @@ const ShabdGPT: React.FC = () => {
   const API_KEY = import.meta.env.VITE_ASSEMBLYAI_API_KEY;
 
   useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       const recognitionInstance = new SpeechRecognition();
-      
+
       recognitionInstance.continuous = true;
       recognitionInstance.interimResults = true;
       recognitionInstance.lang = 'hi-IN';
-      
+
       recognitionInstance.onresult = (event: any) => {
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -53,10 +61,10 @@ const ShabdGPT: React.FC = () => {
         }
         if (finalTranscript) setTranscript(finalTranscript);
       };
-      
+
       setRecognition(recognitionInstance);
     }
-    
+
     return () => {
       if (recognition) recognition.stop();
     };
@@ -69,14 +77,14 @@ const ShabdGPT: React.FC = () => {
   const handleGameResponseWithTranscript = (challenge: Challenge, transcript: string) => {
     const similarity = calculateSimilarity(transcript.toLowerCase(), challenge.pronunciation?.toLowerCase() || '');
     const isCorrect = similarity > 0.6;
-    
+
     if (isCorrect) {
       simulateAIResponse(`Great job! Your pronunciation was good. I heard: "${transcript}". The phrase "${challenge.hindi}" means "${challenge.english}".`);
     } else {
       simulateAIResponse(`Good try! I heard: "${transcript}". The correct pronunciation is "${challenge.pronunciation}". Let's try again.`);
       return;
     }
-    
+
     if (currentLevel && currentChallengeIndex < currentLevel.challenges.length - 1) {
       setTimeout(() => {
         setCurrentChallengeIndex(prev => prev + 1);
@@ -86,20 +94,20 @@ const ShabdGPT: React.FC = () => {
     } else {
       setTimeout(() => {
         if (currentLevel) {
-          setLevels(prev => prev.map(lvl => 
-            lvl.id === currentLevel.id 
-              ? { ...lvl, isCompleted: true } 
+          setLevels(prev => prev.map(lvl =>
+            lvl.id === currentLevel.id
+              ? { ...lvl, isCompleted: true }
               : lvl
           ));
-          
+
           if (currentLevel.id < levels.length) {
-            setLevels(prev => prev.map(lvl => 
-              lvl.id === currentLevel.id + 1 
-                ? { ...lvl, isUnlocked: true } 
+            setLevels(prev => prev.map(lvl =>
+              lvl.id === currentLevel.id + 1
+                ? { ...lvl, isUnlocked: true }
                 : lvl
             ));
           }
-          
+
           simulateAIResponse(`🎉 Congratulations! You've completed the "${currentLevel.name}" level! You can now move to the next level or practice more.`);
           setGameMode(false);
           setCurrentLevel(null);
@@ -112,14 +120,14 @@ const ShabdGPT: React.FC = () => {
   const calculateSimilarity = (str1: string, str2: string): number => {
     const words1 = str1.split(' ');
     const words2 = str2.split(' ');
-    
+
     let matches = 0;
     for (const word1 of words1) {
       if (words2.some(word2 => word2.includes(word1) || word1.includes(word2))) {
         matches++;
       }
     }
-    
+
     return matches / Math.max(words1.length, words2.length);
   };
 
@@ -149,7 +157,7 @@ const ShabdGPT: React.FC = () => {
       setTranscriptionProgress(50);
       const transcriptResponse = await axios.post(
         "https://api.assemblyai.com/v2/transcript",
-        { 
+        {
           audio_url: fileUrl,
           language_code: "hi"
         },
@@ -173,20 +181,20 @@ const ShabdGPT: React.FC = () => {
             headers: { authorization: API_KEY },
           }
         );
-        
+
         transcriptData = pollingResponse.data;
         setTranscriptionProgress(50 + Math.min(40, attempts * 2));
-        
+
         if (transcriptData.status === "completed") {
           break;
         } else if (transcriptData.status === "error") {
           throw new Error("Transcription error: " + transcriptData.error);
         }
-        
+
         attempts++;
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      
+
       setTranscriptionProgress(100);
       return transcriptData.text || "";
     } catch (error) {
@@ -203,34 +211,34 @@ const ShabdGPT: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       setMediaRecorder(recorder);
-      
+
       // Reset audio chunks at the start of recording
       audioChunksRef.current = [];
-      
+
       setIsRecording(true);
-      
+
       if (recognition) {
         recognition.start();
       }
-      
+
       recorder.ondataavailable = (e) => {
         audioChunksRef.current.push(e.data);
       };
-      
+
       recorder.onstop = async () => {
         // Create a local copy of the chunks to process
         const currentAudioChunks = [...audioChunksRef.current];
-        
+
         // Clear the ref immediately to prevent reuse
         audioChunksRef.current = [];
-        
+
         const audioBlob = new Blob(currentAudioChunks, { type: "audio/webm" });
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
-        
+
         try {
           setIsTranscribing(true);
-          
+
           const userMessage: Message = {
             text: "🎤 Recording...",
             isUser: true,
@@ -239,18 +247,18 @@ const ShabdGPT: React.FC = () => {
             isLoading: true
           };
           setMessages(prev => [...prev, userMessage]);
-          
+
           const uploadedUrl = await uploadAudio(audioBlob);
           const transcriptText = await transcribeAudio(uploadedUrl);
-          
-          setMessages(prev => prev.map(msg => 
+
+          setMessages(prev => prev.map(msg =>
             msg.isLoading ? {
               ...msg,
               text: `🎤 "${transcriptText}"`,
               isLoading: false
             } : msg
           ));
-          
+
           if (gameMode && currentLevel) {
             const challenge = currentLevel.challenges[currentChallengeIndex];
             handleGameResponseWithTranscript(challenge, transcriptText);
@@ -258,21 +266,21 @@ const ShabdGPT: React.FC = () => {
             processWithAI(transcriptText);
           }
         } catch (error) {
-          setMessages(prev => prev.map(msg => 
+          setMessages(prev => prev.map(msg =>
             msg.isLoading ? {
               ...msg,
               text: "🎤 Voice message (transcription failed)",
               isLoading: false
             } : msg
           ));
-          
+
           simulateAIResponse("I couldn't transcribe your voice message. Please try again or type your message instead.");
         } finally {
           setIsTranscribing(false);
           setTranscriptionProgress(0);
         }
       };
-      
+
       recorder.start();
     } catch (error) {
       console.error("Error accessing microphone:", error);
@@ -286,7 +294,7 @@ const ShabdGPT: React.FC = () => {
       mediaRecorder.stop();
       if (recognition) recognition.stop();
       setIsRecording(false);
-      
+
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
   };
@@ -298,7 +306,7 @@ const ShabdGPT: React.FC = () => {
       timestamp: new Date(),
       isLoading: true
     };
-    
+
     setMessages(prev => [...prev, loadingMessage]);
     setIsTyping(true);
 
@@ -330,30 +338,42 @@ const ShabdGPT: React.FC = () => {
   const ai = new GoogleGenAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
   });
-  
+
   const fallbackResponses = [
     "नमस्ते! कैसे हो आप? (Hello! How are you?)",
-    "शब्दGPT में आपका स्वागत है! (Welcome to ShabdGPT!)",
+    "शब्दशिक्षा में आपका स्वागत है! (Welcome to ShabdShiksha!)",
     "Hindi uses the Devanagari script.",
     "मैं आपकी मदद कर सकता हूँ। (I can help you.)",
     "Try practicing one phrase every day!"
   ];
 
   async function fetchAIResponse(userQuery: string): Promise<string> {
-    try {
-      const prompt = `You are a helpful Hindi language learning assistant. Provide concise responses (under 100 words). When appropriate, include both Hindi text and English translations. Focus on helping users learn Hindi vocabulary, grammar, and cultural aspects.\n\n${userQuery}`;
-  
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: prompt,
-      });
-  
-      return response.text;
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-    }
+  try {
+    const prompt = `You are a helpful Hindi language learning assistant. Provide concise responses (under 100 words) in plain text only — no markdown, no bullet points, no asterisks. Include both Hindi text and English translations where relevant.\n\n${userQuery}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+
+    let text =
+      response?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+      "Sorry, I couldn't generate a response.";
+
+    text = text
+      .replace(/\*\*(.*?)\*\*/g, "$1") 
+      .replace(/\*(.*?)\*/g, "$1")
+      .replace(/^\s*[\*\-]\s*/gm, "")
+      .trim();
+
+    return text;
+  } catch (error) {
+    console.error("Error fetching AI response:", error);
+    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
   }
+}
+
+
 
   const simulateAIResponse = (text: string) => {
     const loadingMessage: Message = {
@@ -362,10 +382,10 @@ const ShabdGPT: React.FC = () => {
       timestamp: new Date(),
       isLoading: true
     };
-    
+
     setMessages(prev => [...prev, loadingMessage]);
     setIsTyping(true);
-    
+
     setTimeout(() => {
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
@@ -390,26 +410,26 @@ const ShabdGPT: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInput("");
-    
+
     if (input.toLowerCase().includes("practice") || input.toLowerCase().includes("level") || input.toLowerCase().includes("learn") || input.toLowerCase().includes("game")) {
       setShowLevels(true);
       simulateAIResponse("Great! Here are our learning levels. Choose one to start practicing your Hindi skills.");
       return;
     }
-    
+
     const loadingMessage: Message = {
       text: "...",
       isUser: false,
       timestamp: new Date(),
       isLoading: true
     };
-    
+
     setMessages(prev => [...prev, loadingMessage]);
     setIsTyping(true);
 
     try {
       const aiResponse = await fetchAIResponse(input);
-      
+
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
@@ -420,7 +440,7 @@ const ShabdGPT: React.FC = () => {
       });
     } catch (error) {
       const fallbackResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-      
+
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isLoading);
         return [...filtered, {
@@ -434,26 +454,40 @@ const ShabdGPT: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if ('speechSynthesis' in window) {
-      // Chrome needs this to load voices
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-      };
-    }
-  }, []);
+useEffect(() => {
+  if ('speechSynthesis' in window) {
+    // Load voices
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+
+    // Stop speaking on refresh or tab close
+    const handleBeforeUnload = () => {
+      window.speechSynthesis.cancel();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup for component unmount
+    return () => {
+      window.speechSynthesis.cancel();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }
+}, []);
+
+
 
   const startLevel = (level: LearningLevel) => {
     if (!level.isUnlocked) {
       simulateAIResponse("You need to complete the previous level first!");
       return;
     }
-    
+
     setCurrentLevel(level);
     setCurrentChallengeIndex(0);
     setGameMode(true);
     setShowLevels(false);
-    
+
     const challenge = level.challenges[0];
     simulateAIResponse(`Let's practice ${level.name}! Try to pronounce: "${challenge.hindi}" (${challenge.english}). Click the microphone button and say it out loud.`);
   };
@@ -476,21 +510,11 @@ const ShabdGPT: React.FC = () => {
         <title>ShabdGPT - Interactive Hindi Learning Assistant</title>
         <meta name="description" content="Learn Hindi with our AI-powered assistant and interactive games" />
       </Helmet>
-      
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="flex justify-center items-center mb-10">
-          <motion.h1 
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-hindi-purple to-hindi-magenta text-transparent bg-clip-text"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            शब्दGPT
-          </motion.h1>
-        </div>
-        
-        <motion.div 
-          className="mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
+
+      <div className="container mx-auto px-0 sm:px-4 py-8 max-w-5xl">
+
+        <motion.div
+          className="mx-auto bg-white rounded-sm sm:rounded-xl shadow-sm overflow-hidden border border-gray-100"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -501,16 +525,16 @@ const ShabdGPT: React.FC = () => {
                 <Bot className="h-6 w-6" />
               </div>
               <h3 className="font-semibold text-xl">
-                {gameMode && currentLevel 
-                  ? `Level ${currentLevel.id}: ${currentLevel.name}` 
-                  : "Hindi Learning Assistant"}
+                {gameMode && currentLevel
+                  ? `Level ${currentLevel.id}: ${currentLevel.name}`
+                  : "ShabdGPT Assistant"}
               </h3>
             </div>
             <div className="flex items-center gap-3">
               {gameMode && (
-                <button 
+                <button
                   onClick={exitGame}
-                  className="bg-white/20 p-2 rounded-full hover:bg-white/30 transition-colors"
+                  className="bg-white/20 p-2 hidden sm:block rounded-full hover:bg-white/30 transition-colors"
                   title="Exit practice"
                 >
                   <motion.div whileHover={{ rotate: 90 }} transition={{ duration: 0.2 }}>
@@ -521,8 +545,19 @@ const ShabdGPT: React.FC = () => {
                   </motion.div>
                 </button>
               )}
-              <motion.div 
-                className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm"
+              {!gameMode && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setGameMode(true); setShowLevels(true) }}
+                  className="  text-white hover:text-purple-200 transition-colors"
+                  title="Show learning levels"
+                >
+                  <BookOpen className="h-5 w-5" />
+                </motion.button>
+              )}
+              <motion.div
+                className="hidden sm:flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -531,11 +566,11 @@ const ShabdGPT: React.FC = () => {
               </motion.div>
             </div>
           </div>
-          
+
           <div className="h-[65vh] overflow-y-auto p-6 flex flex-col gap-4 bg-gradient-to-b from-gray-50 to-white">
             <AnimatePresence mode="wait">
               {showLevels ? (
-                <motion.div 
+                <motion.div
                   key="levels"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -545,42 +580,40 @@ const ShabdGPT: React.FC = () => {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="font-bold text-hindi-dark text-2xl">Learning Levels</h3>
                     <button
-                      onClick={() => setShowLevels(false)}
+                      onClick={() => { setShowLevels(false); setGameMode(false) }}
                       className="flex items-center gap-1 text-hindi-purple hover:text-hindi-magenta transition-colors px-3 py-1.5 rounded-full border border-hindi-purple/30 hover:bg-hindi-purple/5"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       <span>Back to chat</span>
                     </button>
                   </div>
-                  
+
                   {levels.map((level) => (
                     <motion.div
                       key={level.id}
                       whileHover={level.isUnlocked ? { scale: 1.02, y: -2 } : {}}
-                      className={`p-5 rounded-xl border ${
-                        level.isCompleted 
-                          ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200' 
-                          : level.isUnlocked 
-                            ? 'bg-white border-hindi-purple/30 cursor-pointer hover:shadow-lg transition-all duration-300' 
-                            : 'bg-gray-100 border-gray-200 opacity-70'
-                      }`}
+                      className={`p-5 rounded-xl border ${level.isCompleted
+                        ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-200'
+                        : level.isUnlocked
+                          ? 'bg-white border-hindi-purple/30 cursor-pointer hover:shadow-lg transition-all duration-300'
+                          : 'bg-gray-100 border-gray-200 opacity-70'
+                        }`}
                       onClick={() => level.isUnlocked && startLevel(level)}
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-4">
-                          <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-md ${
-                            level.isCompleted 
-                              ? 'bg-gradient-to-r from-green-400 to-green-500 text-white' 
-                              : level.isUnlocked 
-                                ? 'bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white' 
-                                : 'bg-gray-300 text-white'
-                          }`}>
+                          <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-md ${level.isCompleted
+                            ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
+                            : level.isUnlocked
+                              ? 'bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white'
+                              : 'bg-gray-300 text-white'
+                            }`}>
                             {level.isCompleted ? (
                               <Check className="h-7 w-7" />
                             ) : level.isUnlocked ? (
                               level.id === 1 ? <BookOpen className="h-6 w-6" /> :
-                              level.id === 2 ? <Zap className="h-6 w-6" /> :
-                              <span className="text-xl font-bold">{level.id}</span>
+                                level.id === 2 ? <Zap className="h-6 w-6" /> :
+                                  <span className="text-xl font-bold">{level.id}</span>
                             ) : (
                               <Lock className="h-6 w-6" />
                             )}
@@ -598,13 +631,13 @@ const ShabdGPT: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        
+
                         {level.isUnlocked && !level.isCompleted && (
                           <div className="bg-hindi-purple/10 p-2.5 rounded-full">
                             <ChevronRight className="h-5 w-5 text-hindi-purple" />
                           </div>
                         )}
-                        
+
                         {level.isCompleted && (
                           <div className="flex items-center gap-1 bg-green-100 px-4 py-2 rounded-full text-sm text-green-700 font-medium">
                             <Award className="h-4 w-4" />
@@ -632,27 +665,26 @@ const ShabdGPT: React.FC = () => {
                       className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
                     >
                       {!message.isUser && !message.isLoading && (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-hindi-purple/20 to-hindi-magenta/20 flex items-center justify-center mr-3 mt-1 shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-hindi-purple/20 to-hindi-magenta/20 hidden sm:flex items-center justify-center mr-3 mt-1 shadow-sm">
                           <Bot className="h-5 w-5 text-hindi-purple" />
                         </div>
                       )}
-                      
+
                       <div
-                        className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
-                          message.isLoading 
-                            ? "bg-gray-100 text-gray-500 rounded-tl-none flex items-center space-x-1" 
-                            : message.isUser 
-                              ? "bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white rounded-tr-none" 
-                              : "bg-white border border-gray-100 rounded-tl-none"
-                        }`}
+                        className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${message.isLoading
+                          ? "bg-gray-100 text-gray-500 rounded-tl-none flex items-center space-x-1"
+                          : message.isUser
+                            ? "bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white rounded-tr-none"
+                            : "bg-white border border-gray-100 rounded-tl-none"
+                          }`}
                       >
                         {message.isLoading ? (
                           message.isUser && message.text.includes("Recording") ? (
                             <div className="flex flex-col w-full">
                               <div className="text-sm">{message.text}</div>
                               <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                                <div 
-                                  className="bg-hindi-purple h-1.5 rounded-full" 
+                                <div
+                                  className="bg-hindi-purple h-1.5 rounded-full"
                                   style={{ width: `${transcriptionProgress}%` }}
                                 ></div>
                               </div>
@@ -667,7 +699,7 @@ const ShabdGPT: React.FC = () => {
                         ) : (
                           <div>
                             <div className="whitespace-pre-wrap leading-relaxed">{message.text}</div>
-                            
+
                             {message.audioUrl && (
                               <div className="mt-2">
                                 <button
@@ -679,7 +711,7 @@ const ShabdGPT: React.FC = () => {
                                 </button>
                               </div>
                             )}
-                            
+
                             {/* Add speak button for bot messages */}
                             {!message.isUser && (
                               <div className="mt-2 flex gap-2">
@@ -704,9 +736,9 @@ const ShabdGPT: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       {message.isUser && (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-hindi-purple to-hindi-magenta flex items-center justify-center ml-3 mt-1 shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-hindi-purple to-hindi-magenta hidden sm:flex items-center justify-center ml-3 mt-1 shadow-sm">
                           <User className="h-5 w-5 text-white" />
                         </div>
                       )}
@@ -717,29 +749,12 @@ const ShabdGPT: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
-          
+
           {!showLevels && (
             <div className="p-5 border-t border-gray-100 bg-white">
               <div className="flex items-center gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isTranscribing}
-                  className={`p-3.5 rounded-full ${
-                    isRecording 
-                      ? "bg-red-500 text-white animate-pulse shadow-md shadow-red-200" 
-                      : isTranscribing
-                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  } transition-colors shadow-sm`}
-                  title={isRecording ? "Stop recording" : "Start recording"}
-                >
-                  {isRecording ? <MicOff className="h-5 w-5" /> : 
-                   isTranscribing ? <Loader2 className="h-5 w-5 animate-spin" /> : 
-                   <Mic className="h-5 w-5" />}
-                </motion.button>
-                
+
+
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -751,30 +766,35 @@ const ShabdGPT: React.FC = () => {
                     ref={inputRef}
                     disabled={isTyping}
                   />
-                  
-                  {!gameMode && (
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setShowLevels(true)}
-                      className="absolute right-14 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-hindi-purple transition-colors"
-                      title="Show learning levels"
-                      >
-                      <BookOpen className="h-5 w-5" />
-                    </motion.button>
-                  )}
+
+
                 </div>
-                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isTranscribing}
+                  className={`p-3.5 rounded-full ${isRecording
+                    ? "bg-red-500 text-white animate-pulse shadow-md shadow-red-200"
+                    : isTranscribing
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    } transition-colors shadow-sm`}
+                  title={isRecording ? "Stop recording" : "Start recording"}
+                >
+                  {isRecording ? <MicOff className="h-5 w-5" /> :
+                    isTranscribing ? <Loader2 className="h-5 w-5 animate-spin" /> :
+                      <Mic className="h-5 w-5" />}
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSendMessage}
                   disabled={!input.trim() || isTyping}
-                  className={`p-3.5 rounded-full ${
-                    !input.trim() || isTyping
-                      ? "bg-gray-100 text-gray-400"
-                      : "bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white hover:shadow-md"
-                  } transition-all shadow-sm`}
+                  className={`p-3.5 rounded-full ${!input.trim() || isTyping
+                    ? "bg-gray-100 text-gray-400"
+                    : "bg-gradient-to-r from-hindi-purple to-hindi-magenta text-white hover:shadow-md"
+                    } transition-all shadow-sm`}
                   title="Send message"
                 >
                   {isTyping ? (
@@ -784,7 +804,7 @@ const ShabdGPT: React.FC = () => {
                   )}
                 </motion.button>
               </div>
-              
+
               {gameMode && currentLevel && (
                 <div className="mt-4 flex justify-between items-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
                   <div className="flex items-center gap-1.5">
@@ -807,8 +827,8 @@ const ShabdGPT: React.FC = () => {
             </div>
           )}
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           className="text-center mt-6 text-gray-500 text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -816,7 +836,7 @@ const ShabdGPT: React.FC = () => {
         >
           <div className="flex items-center justify-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-hindi-purple" />
-            <span>Powered by Gemini AI • Learn Hindi with ShabdGPT</span>
+            <span>Powered by Gemini AI • Learn Hindi with ShabdShiksha</span>
           </div>
         </motion.div>
       </div>
@@ -827,37 +847,22 @@ const ShabdGPT: React.FC = () => {
 export default ShabdGPT;
 
 
-// Function to speak text using Web Speech API
 const speakText = (text: string) => {
   if ('speechSynthesis' in window) {
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
-    
-    // Create a new speech synthesis utterance
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Detect if text contains Hindi characters
     const containsHindi = /[\u0900-\u097F]/.test(text);
-    
-    // Set language based on content
     utterance.lang = containsHindi ? 'hi-IN' : 'en-US';
-    
-    // Get available voices
     const voices = window.speechSynthesis.getVoices();
-    
-    // Try to find a Hindi voice if text contains Hindi
+
     if (containsHindi) {
-      const hindiVoice = voices.find(voice => 
+      const hindiVoice = voices.find(voice =>
         voice.lang.includes('hi') || voice.name.includes('Hindi')
       );
       if (hindiVoice) utterance.voice = hindiVoice;
     }
-    
-    // Speak the text
     window.speechSynthesis.speak(utterance);
   } else {
     console.error("Speech synthesis not supported in this browser");
   }
 };
-
-// Load voices when the component mounts
