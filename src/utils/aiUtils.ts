@@ -21,7 +21,6 @@ export async function fetchAIResponse(userQuery: string): Promise<string> {
       apiKey: import.meta.env.VITE_GEMINI_API_KEY,
     });
 
-    // Construct the full prompt by combining a static instruction with the user query
     const prompt = `You are a helpful Hindi language learning assistant. Provide concise responses (under 100 words). When appropriate, include both Hindi text and English translations. Focus on helping users learn Hindi vocabulary, grammar, and cultural aspects.\n\n${userQuery}`;
 
     // Call the Gemini API using the GoogleGenAI library
