@@ -13,8 +13,6 @@ const App: React.FC = () => {
           <title>ShabdGPT - Learn Hindi Language</title>
           <meta name="description" content="Learn Hindi language with interactive tools and AI assistance" />
         </Helmet>
-
-
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
