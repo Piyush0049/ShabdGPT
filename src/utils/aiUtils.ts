@@ -15,7 +15,6 @@ export const calculateSimilarity = (str1: string, str2: string): number => {
   return matches / Math.max(words1.length, words2.length);
 };
 
-// Fetch AI response from Gemini
 export async function fetchAIResponse(userQuery: string): Promise<string> {
   try {
     const ai = new GoogleGenAI({
