@@ -1,9 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { fallbackResponses } from "../constants/shabdgpt";
 
-// Calculate similarity between strings
 export const calculateSimilarity = (str1: string, str2: string): number => {
-  // Simple implementation - can be improved with more sophisticated algorithms
   const words1 = str1.split(' ');
   const words2 = str2.split(' ');
   
