@@ -25,9 +25,7 @@ exports.updateProfile = async (req, res, next) => {
   }
 };
 
-// @desc    Update user progress
-// @route   PUT /api/users/progress
-// @access  Private
+
 exports.updateProgress = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
