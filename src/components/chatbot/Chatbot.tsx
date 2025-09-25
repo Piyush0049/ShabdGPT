@@ -303,8 +303,6 @@ const Chatbot: React.FC = () => {
   };
 
   const handleGameResponse = (challenge: Challenge) => {
-    // In a real app, you would compare the speech recognition result with the expected phrase
-    // For now, we'll simulate success with occasional "corrections"
     
     const isCorrect = Math.random() > 0.3; // 70% chance of being "correct"
     
