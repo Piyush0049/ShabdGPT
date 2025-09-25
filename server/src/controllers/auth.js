@@ -76,9 +76,7 @@ exports.getMe = async (req, res, next) => {
   }
 };
 
-// @desc    Log user out / clear cookie
-// @route   GET /api/auth/logout
-// @access  Private
+
 exports.logout = async (req, res, next) => {
   res.status(200).json({
     success: true,
