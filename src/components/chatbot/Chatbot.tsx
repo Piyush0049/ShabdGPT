@@ -272,7 +272,6 @@ const Chatbot: React.FC = () => {
         }];
       });
     } catch (error) {
-      // If API fails, use fallback
       const fallbackResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
       
       setMessages(prev => {
