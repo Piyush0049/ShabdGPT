@@ -1,8 +1,5 @@
 const User = require('../models/User');
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
-// @access  Private
 exports.updateProfile = async (req, res, next) => {
   try {
     const fieldsToUpdate = {
