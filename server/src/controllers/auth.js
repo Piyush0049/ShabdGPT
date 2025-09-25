@@ -27,9 +27,6 @@ exports.register = async (req, res, next) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
