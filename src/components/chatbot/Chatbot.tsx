@@ -313,7 +313,6 @@ const Chatbot: React.FC = () => {
       return; // Don't advance to next challenge
     }
     
-    // Move to next challenge or complete level
     if (currentLevel && currentChallengeIndex < currentLevel.challenges.length - 1) {
       setTimeout(() => {
         setCurrentChallengeIndex(prev => prev + 1);
