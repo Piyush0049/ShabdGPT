@@ -304,7 +304,7 @@ const Chatbot: React.FC = () => {
 
   const handleGameResponse = (challenge: Challenge) => {
     
-    const isCorrect = Math.random() > 0.3; // 70% chance of being "correct"
+    const isCorrect = Math.random() > 0.3;
     
     if (isCorrect) {
       simulateAIResponse(`Great job! Your pronunciation was good. "${challenge.hindi}" means "${challenge.english}".`);
