@@ -310,7 +310,7 @@ const Chatbot: React.FC = () => {
       simulateAIResponse(`Great job! Your pronunciation was good. "${challenge.hindi}" means "${challenge.english}".`);
     } else {
       simulateAIResponse(`Good try! The correct pronunciation is "${challenge.pronunciation}". Let's try again.`);
-      return; // Don't advance to next challenge
+      return;
     }
     
     if (currentLevel && currentChallengeIndex < currentLevel.challenges.length - 1) {
