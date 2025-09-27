@@ -328,7 +328,6 @@ const Chatbot: React.FC = () => {
               : lvl
           ));
           
-          // Unlock next level if exists
           if (currentLevel.id < levels.length) {
             setLevels(prev => prev.map(lvl => 
               lvl.id === currentLevel.id + 1 
