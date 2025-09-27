@@ -320,7 +320,6 @@ const Chatbot: React.FC = () => {
         simulateAIResponse(`Next, try to pronounce: "${nextChallenge.hindi}" (${nextChallenge.english})`);
       }, 2000);
     } else {
-      // Level completed
       setTimeout(() => {
         if (currentLevel) {
           // Mark current level as completed
