@@ -322,7 +322,6 @@ const Chatbot: React.FC = () => {
     } else {
       setTimeout(() => {
         if (currentLevel) {
-          // Mark current level as completed
           setLevels(prev => prev.map(lvl => 
             lvl.id === currentLevel.id 
               ? { ...lvl, isCompleted: true } 
