@@ -335,9 +335,9 @@ const ShabdGPT: React.FC = () => {
     }
   };
 
-  const ai = new GoogleGenAI({
-    apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-  });
+  const HF_API_KEY = import.meta.env.VITE_HF_API_KEY;
+  const HF_API_URL = "https://router.huggingface.co/v1/chat/completions";
+
 
   const fallbackResponses = [
     "नमस्ते! कैसे हो आप? (Hello! How are you?)",
@@ -348,30 +348,49 @@ const ShabdGPT: React.FC = () => {
   ];
 
   async function fetchAIResponse(userQuery: string): Promise<string> {
-  try {
-    const prompt = `You are a helpful Hindi language learning assistant. Provide concise responses (under 100 words) in plain text only — no markdown, no bullet points, no asterisks. Include both Hindi text and English translations where relevant.\n\n${userQuery}`;
+    try {
+      const prompt = `
+You are a helpful Hindi language learning assistant.
+Provide concise responses (under 100 words).
+Plain text only. No markdown.
+Include Hindi + English meaning when useful.
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+User input:
+${userQuery}
+`.trim();
 
-    let text =
-      response?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
-      "Sorry, I couldn't generate a response.";
+      const response = await axios.post(
+        HF_API_URL,
+        {
+          model: "google/gemma-2-2b-it",
+          messages: [
+            { role: "system", content: "You are a Hindi learning assistant." },
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.6,
+          max_tokens: 200
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${HF_API_KEY}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
 
-    text = text
-      .replace(/\*\*(.*?)\*\*/g, "$1") 
-      .replace(/\*(.*?)\*/g, "$1")
-      .replace(/^\s*[\*\-]\s*/gm, "")
-      .trim();
+      const text =
+        response?.data?.choices?.[0]?.message?.content?.trim();
 
-    return text;
-  } catch (error) {
-    console.error("Error fetching AI response:", error);
-    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+      return (
+        text ||
+        fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)]
+      );
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+    }
   }
-}
+
 
 
 
@@ -454,26 +473,26 @@ const ShabdGPT: React.FC = () => {
     }
   };
 
-useEffect(() => {
-  if ('speechSynthesis' in window) {
-    // Load voices
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.getVoices();
-    };
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      // Load voices
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
 
-    // Stop speaking on refresh or tab close
-    const handleBeforeUnload = () => {
-      window.speechSynthesis.cancel();
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
+      // Stop speaking on refresh or tab close
+      const handleBeforeUnload = () => {
+        window.speechSynthesis.cancel();
+      };
+      window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup for component unmount
-    return () => {
-      window.speechSynthesis.cancel();
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }
-}, []);
+      // Cleanup for component unmount
+      return () => {
+        window.speechSynthesis.cancel();
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+      };
+    }
+  }, []);
 
 
 
