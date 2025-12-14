@@ -35,7 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
       } catch (error) {
         console.error("Failed to parse auth token:", error);
-        // Clear invalid token
         localStorage.removeItem('hindi-auth-token');
       }
     }
