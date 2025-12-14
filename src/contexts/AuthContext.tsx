@@ -28,7 +28,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fix: Properly retrieve and parse the token
     const token = localStorage.getItem('hindi-auth-token');
     if (token) {
       try {
