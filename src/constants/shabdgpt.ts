@@ -1,6 +1,5 @@
 import { LearningLevel } from '../types/shabdgpt';
 
-// Fallback responses if API fails
 export const fallbackResponses = [
   "नमस्ते! कैसे हो आप? (Hello! How are you?)",
   "शब्दGPT में आपका स्वागत है! (Welcome to ShabdGPT!)",
@@ -11,7 +10,6 @@ export const fallbackResponses = [
   "Hindi is the 4th most spoken language in the world."
 ];
 
-// Learning levels data
 export const learningLevels: LearningLevel[] = [
   {
     id: 1,
