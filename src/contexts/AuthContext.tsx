@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('hindi-auth-token');
     if (token) {
       try {
-        // Parse the token directly without splitting
         const userData = JSON.parse(atob(token));
         setUser(userData);
       } catch (error) {
