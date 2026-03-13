@@ -7,6 +7,48 @@ import { GoogleGenAI } from "@google/genai";
 
 import { Message, LearningLevel, learningLevels, Challenge } from "./LearningLevels";
 
+// TypeScript interfaces for Web APIs
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+}
+
+interface SpeechRecognitionConstructor {
+  new(): SpeechRecognitionInstance;
+}
+
+interface AssemblyAITranscriptResponse {
+  id: string;
+  status: 'queued' | 'processing' | 'completed' | 'error';
+  text?: string;
+  error?: string;
+}
+
 const ShabdGPT: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -24,7 +66,7 @@ const ShabdGPT: React.FC = () => {
   const [currentLevel, setCurrentLevel] = useState<LearningLevel | null>(null);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [gameMode, setGameMode] = useState(false);
-  const [recognition, setRecognition] = useState<any>(null);
+  const [recognition, setRecognition] = useState<SpeechRecognitionInstance | null>(null);
   const [transcript, setTranscript] = useState("");
   const audioChunksRef = useRef<Blob[]>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -46,14 +88,20 @@ const ShabdGPT: React.FC = () => {
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const SpeechRecognition = ((window as typeof window & {
+        webkitSpeechRecognition?: SpeechRecognitionConstructor;
+        SpeechRecognition?: SpeechRecognitionConstructor;
+      }).webkitSpeechRecognition || (window as typeof window & {
+        SpeechRecognition?: SpeechRecognitionConstructor;
+      }).SpeechRecognition) as SpeechRecognitionConstructor;
+
       const recognitionInstance = new SpeechRecognition();
 
       recognitionInstance.continuous = true;
       recognitionInstance.interimResults = true;
       recognitionInstance.lang = 'hi-IN';
 
-      recognitionInstance.onresult = (event: any) => {
+      recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
@@ -170,12 +218,12 @@ const ShabdGPT: React.FC = () => {
       );
 
       const transcriptId = transcriptResponse.data.id;
-      let transcriptData: any = null;
+      let transcriptData: AssemblyAITranscriptResponse | null = null;
       let attempts = 0;
       const maxAttempts = 30;
 
       while (attempts < maxAttempts) {
-        const pollingResponse = await axios.get(
+        const pollingResponse = await axios.get<AssemblyAITranscriptResponse>(
           `https://api.assemblyai.com/v2/transcript/${transcriptId}`,
           {
             headers: { authorization: API_KEY },
@@ -196,7 +244,7 @@ const ShabdGPT: React.FC = () => {
       }
 
       setTranscriptionProgress(100);
-      return transcriptData.text || "";
+      return transcriptData?.text || "";
     } catch (error) {
       console.error("Error transcribing audio:", error);
       setTranscriptionError("Failed to transcribe audio");
@@ -362,7 +410,7 @@ ${userQuery}
       const response = await axios.post(
         HF_API_URL,
         {
-          model: "google/gemma-2-2b-it",
+          model: "meta-llama/Llama-3.3-70B-Instruct",
           messages: [
             { role: "system", content: "You are a Hindi learning assistant." },
             { role: "user", content: prompt }
